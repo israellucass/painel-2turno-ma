@@ -1,0 +1,24 @@
+{
+ "gerado_em": "2026-10-18 13:27:30",
+ "secoes": 194,
+ "sha256_16": {
+  "extracted/secoes_utf8.csv": "398223d4682ccd2e",
+  "extracted/secoes_eleitorais_alteradas_2t-pais_2026_ma.csv": "4ef7bc7359fec5c2",
+  "extracted/votacao_secao_2026_BR.csv": null,
+  "extracted/votacao_secao_2026_MA.csv": null,
+  "extracted/cruzados.json": "bf87b97e0895b24b",
+  "extracted/presidente_vetores.json": "fb0efa3c71413b33",
+  "extracted/distancias.json": "32500c64a7edf4c7",
+  "extracted/votos_por_secao.json": "d540209b97483bf5",
+  "extracted/deslocamento_por_candidato.json": "437046b0821073fd",
+  "extracted/locais_ranking.json": "9fbadc025ddf9476",
+  "secoes_eleitorais_alteradas_2t-pais_2026_ma.csv.zip": "c8ca7b79a13415ca",
+  "eleitorado_local_votacao_2026.zip": null
+ },
+ "fontes": {
+  "secoes_alteradas": "TSE — secoes_eleitorais_alteradas_2t-pais_2026_ma.csv",
+  "votacao": "TSE — votacao_secao_2026_BR.csv / _MA.csv (1º turno, 04/10/2026)",
+  "locais": "TSE — eleitorado_local_votacao_2026.zip (linhas do 1º e do 2º turno)"
+ },
+ "auditoria": "extracted/_auditoria/"
+}
