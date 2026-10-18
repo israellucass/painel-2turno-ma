@@ -176,6 +176,9 @@ h1{font-family:var(--display); font-weight:700; font-size:clamp(22px,5.2vw,58px)
 .cp-linha{padding:15px 20px}
 .cp-linha:nth-child(even){background:#FAFBFA}
 .cp-linha:hover{background:#F2F7F2}
+.cp-linha.outros{background:#F4F6F3}
+.cp-linha.outros .nome{color:var(--muted); font-weight:600}
+.cp-linha.outros .bigp{color:var(--muted); font-size:18px}
 .cp-linha .mudanca{display:block; font-size:13px; font-weight:600; color:var(--muted); margin-top:2px; line-height:1.4}
 .cp-linha .mudanca i{color:#B4480E}
 .cnome{display:flex; align-items:baseline; gap:10px; min-width:0; min-height:24px}
@@ -448,7 +451,10 @@ function parte1t(cargo, agg, nomeRef){
   let h = `<div class="voo">
     <div class="tit">${esc(cargo)} <span>no total das seções transferidas · 1º turno</span></div>`;
   const emFoco = (nomeRef||[]).filter(nm => agg.cands.some(c=>c[0]===nm));
-  const ordemNomes = [...emFoco, ...agg.cands.map(c=>c[0]).filter(nm=>!emFoco.includes(nm) && !nm.startsWith("Votável"))];
+  /* com finalistas definidos (presidência), os demais vão somados em "Outros" */
+  const agrupar = emFoco.length >= 2;
+  const ordemNomes = agrupar ? emFoco
+    : [...emFoco, ...agg.cands.map(c=>c[0]).filter(nm=>!emFoco.includes(nm) && !nm.startsWith("Votável"))];
   ordemNomes.forEach((nm,i)=>{
     const q = (agg.cands.find(c=>c[0]===nm)||[,0])[1];
     const p = share(agg, nm);
@@ -464,7 +470,14 @@ function parte1t(cargo, agg, nomeRef){
       <span class="valor">${pct(p)} <small>· ${fmt(q)}</small></span>
     </div>`;
   });
-  if(agg.outros) h += `<div class="linha"><span class="nome"><span class="ordem">+</span><i>Outros (${fmt(agg.n_outros||0)} candidatos)</i></span><span class="pista"><div class="pintado" style="width:${(100*agg.outros/v).toFixed(1)}%"></div></span><span class="valor">${pct(100*agg.outros/v)} <small>· ${fmt(agg.outros)}</small></span></div>`;
+  if(agrupar){
+    const resto = agg.cands.filter(c=>!emFoco.includes(c[0]) && !c[0].startsWith("Votável"));
+    const q = resto.reduce((a,c)=>a+c[1],0) + (agg.outros||0);
+    const n = resto.length + (agg.n_outros||0);
+    if(n > 0) h += `<div class="linha"><span class="nome"><span class="ordem">+</span><i>Outros (${fmt(n)} candidatos)</i></span><span class="pista"><div class="pintado" style="width:${(100*q/v).toFixed(1)}%"></div></span><span class="valor">${pct(100*q/v)} <small>· ${fmt(q)}</small></span></div>`;
+  } else if(agg.outros){
+    h += `<div class="linha"><span class="nome"><span class="ordem">+</span><i>Outros (${fmt(agg.n_outros||0)} candidatos)</i></span><span class="pista"><div class="pintado" style="width:${(100*agg.outros/v).toFixed(1)}%"></div></span><span class="valor">${pct(100*agg.outros/v)} <small>· ${fmt(agg.outros)}</small></span></div>`;
+  }
   h += `<div class="totais"><span>brancos <b>${fmt(agg.branco)}</b></span><span>nulos <b>${fmt(agg.nulo)}</b></span><span>total na urna <b>${fmt(agg.comparec)}</b></span></div></div>`;
   return h;
 }
@@ -477,30 +490,36 @@ function boletimPres(){
   const valMa  = PRES.totais.ma   || 1;
   const valBr  = PRES.totais.br   || 1;
   const finalistas = PRES.candidatos.slice(0,2).map(c=>c[0]);
-  const linhas = [...PRES.candidatos].sort((a,b)=>b[3]-a[3]);
+  const fin    = PRES.candidatos.filter(c=>finalistas.includes(c[0])).sort((a,b)=>b[3]-a[3]);
+  const outros = PRES.candidatos.filter(c=>!finalistas.includes(c[0]));
+  const soma   = outros.reduce((a,c)=>({br:a.br+c[1], ma:a.ma+c[2], af:a.af+c[3]}),{br:0,ma:0,af:0});
 
-  let rows = "";
-  linhas.forEach((c,i)=>{
-    const [nm, br, ma, af] = c;
+  function linha(nm, br, ma, af, i, ehOutros){
     const pAf = 100*af/valAf, pMa = 100*ma/valMa, pBr = 100*br/valBr;
     const pesoMA = ma ? 100*af/ma : 0;
-    const fin = finalistas.includes(nm);
-    const marca = fin ? `<span class="ordem">${ord(finalistas.indexOf(nm))}</span><span class="tag2t">2º turno</span>` : "";
-    const barra = corVoltavel(nm) || (i===0 ? "cheio" : i===1 ? "riscado" : "pintado");
-    rows += `<div class="cp-linha">
+    const fin2 = !ehOutros && finalistas.includes(nm);
+    const marca = ehOutros
+      ? `<span class="ordem">+</span>`
+      : fin2 ? `<span class="ordem">${ord(finalistas.indexOf(nm))}</span><span class="tag2t">2º turno</span>` : "";
+    const barra = ehOutros ? "pintado" : (corVoltavel(nm) || (i===0 ? "cheio" : "riscado"));
+    return `<div class="cp-linha${ehOutros?" outros":""}">
       <div class="cnome">${marca}<span class="nome uma-linha">${esc(nm)}</span></div>
       <div class="cv"><div class="bigp">${pct(pAf)}</div>
         <div class="pista"><div class="${barra}" style="width:${pAf.toFixed(1)}%"></div></div>
-        <div class="small"><b>${fmt(af)}</b> votos nas 204 seções</div>${ma?`<div class="small peso">${pct(pesoMA)} do próprio voto no MA</div>`:``}</div>
+        <div class="small"><b>${fmt(af)}</b> votos nas 204 seções</div>${!ehOutros && ma?`<div class="small peso">${pct(pesoMA)} do próprio voto no MA</div>`:``}</div>
       <div class="cv"><div class="bigp">${pct(pMa)}</div><div class="small"><b>${fmt(ma)}</b> votos</div></div>
       <div class="cv cb"><div class="bigp">${pct(pBr)}</div><div class="small"><b>${fmt(br)}</b> votos</div></div>
     </div>`;
-  });
+  }
+
+  let rows = "";
+  fin.forEach((c,i)=>{ rows += linha(c[0], c[1], c[2], c[3], i, false); });
+  if(outros.length) rows += linha(`Outros (${outros.length} candidatos)`, soma.br, soma.ma, soma.af, 2, true);
 
   el.innerHTML = `
     <div class="cp-head"><span>Candidato à Presidência</span><span>Como essas pessoas votaram no 1º turno</span><span>No Maranhão</span><span>No Brasil</span></div>
     ${rows}
-    <div class="pesinho">Barras coloridas por candidato: <b style="color:var(--lula)">Lula</b> em vermelho, <b style="color:var(--bolsonaro)">Bolsonaro</b> em azul. Válidos do 1º turno: nas 204 seções <b>${fmt(PRES.totais.afet)}</b>; no Maranhão <b>${fmt(PRES.totais.ma)}</b>; no Brasil <b>${fmt(PRES.totais.br)}</b>. Percentuais sobre votos válidos. Trocar o endereço de votação não muda a intenção de voto: o retrato acima mostra o quanto esses eleitores pesam, candidato a candidato.</div>`;
+    <div class="pesinho">Em destaque, os dois finalistas: <b style="color:var(--lula)">Lula</b> em vermelho e <b style="color:var(--bolsonaro)">Bolsonaro</b> em azul. Os demais <b>${outros.length} candidatos</b> aparecem somados em “Outros”. Válidos do 1º turno: nas 204 seções <b>${fmt(PRES.totais.afet)}</b>; no Maranhão <b>${fmt(PRES.totais.ma)}</b>; no Brasil <b>${fmt(PRES.totais.br)}</b>. Percentuais sobre votos válidos. Trocar o endereço de votação não muda a intenção de voto: o retrato acima mostra o quanto esses eleitores pesam.</div>`;
 }
 
 /* ================= boletim: quem caminha mais (deslocamento por eleitor) ================= */
@@ -508,27 +527,39 @@ function boletimKm(){
   const el = document.getElementById("boletimKm");
   if(!KM || !KM.por_candidato.length){ el.hidden = true; return; }
   const lista = [...KM.por_candidato].sort((a,b)=>b.af-a.af);
-  const borda = Math.max(...lista.map(c=>c.km_medio)) || 1;
+  const destaque = lista.filter(c=>corVoltavel(c.nome));      // Lula e Bolsonaro
+  const outros   = lista.filter(c=>!corVoltavel(c.nome));
+  const borda = Math.max(...destaque.map(c=>c.km_medio)) || 1;
+  const somaOutros = outros.reduce((a,c)=>a+c.af,0);
 
-  let rows = "";
-  lista.forEach((c,i)=>{
+  function linha(c,i){
     const cor  = corVoltavel(c.nome);
-    const barra = cor || (i===0 ? "cheio" : i===1 ? "riscado" : "pintado");
-    const peq  = c.af < 1000;
-    rows += `<div class="cp-linha">
-      <div class="cnome">${i<2?`<span class="ordem">${ord(i)}</span>`:""}<span class="nome uma-linha">${esc(c.nome)}</span></div>
+    const barra = cor || (i===0 ? "cheio" : "riscado");
+    return `<div class="cp-linha">
+      <div class="cnome"><span class="ordem">${ord(i)}</span><span class="nome uma-linha">${esc(c.nome)}</span></div>
       <div class="cv"><div class="bigp">${c.km_medio.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})} km</div>
         <div class="pista"><div class="${barra}" style="width:${(100*c.km_medio/borda).toFixed(1)}%"></div></div>
-        <div class="small">base de <b>${fmt(c.af)}</b> votos${peq?" · amostra pequena":""}</div></div>
+        <div class="small">base de <b>${fmt(c.af)}</b> votos</div></div>
       <div class="cv"><div class="bigp">${pct(c.p_gt2k)}</div><div class="small">além de 2 km</div></div>
       <div class="cv cb"><div class="bigp">${pct(c.p_gt5k)}</div><div class="small">além de 5 km</div></div>
     </div>`;
-  });
+  }
+
+  let rows = destaque.map(linha).join("");
+  if(outros.length){
+    rows += `<div class="cp-linha outros">
+      <div class="cnome"><span class="ordem">+</span><span class="nome uma-linha">Outros (${outros.length} candidatos)</span></div>
+      <div class="cv"><div class="bigp" title="a distância média de um grupo tão heterogêneo não é informativa">—</div>
+        <div class="small">base de <b>${fmt(somaOutros)}</b> votos · amostras pequenas</div></div>
+      <div class="cv"><div class="bigp">—</div><div class="small">além de 2 km</div></div>
+      <div class="cv cb"><div class="bigp">—</div><div class="small">além de 5 km</div></div>
+    </div>`;
+  }
 
   el.innerHTML = `
     <div class="cp-head"><span>Eleitores de cada candidato · 1º turno</span><span>Distância média por eleitor</span><span>Além de 2 km</span><span>Além de 5 km</span></div>
     ${rows}
-    <div class="pesinho">Média geral: <b>${km2(KM.media_geral_km)} km</b> por eleitor, com as coordenadas oficiais do TSE, sobre <b>${pct(KM.cobertura.pct)}</b> dos votos válidos dessas seções. Candidatos com menos de 1.000 votos identificados aparecem só como registro: a base é pequena demais para concluir.</div>`;
+    <div class="pesinho">Média geral: <b>${km2(KM.media_geral_km)} km</b> por eleitor, com as coordenadas oficiais do TSE, sobre <b>${pct(KM.cobertura.pct)}</b> dos votos válidos dessas seções. Só os dois finalistas têm amostra para conclusão; os demais <b>${outros.length} candidatos</b> (menos de 1.000 votos cada) aparecem somados em “Outros”.</div>`;
 }
 
 /* ================= boletim: os deslocamentos mais pesados (locais) ================= */
