@@ -74,6 +74,8 @@ h1{font-family:var(--display); font-weight:700; font-size:clamp(27px,4.6vw,42px)
 .busca button.limpar:hover{background:rgba(255,255,255,.12)}
 .dica{margin-top:10px; font-size:13.5px; color:rgba(244,247,243,.82)}
 .dica b{color:#fff; font-weight:700}
+.dica a{color:#F2B33D; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(242,179,61,.55)}
+.dica a:hover{border-bottom-color:#F2B33D}
 
 /* ============ análise das distâncias ============ */
 .analise{margin:34px 0 8px}
@@ -256,8 +258,18 @@ details.urna-det .dentro{padding:4px 14px 12px; border-top:1px solid var(--borda
 .chamada ul{margin:9px 0 0 18px}
 .chamada li{margin-bottom:4px}
 .chamada a{color:var(--verde); font-weight:600}
-.pes-fim{border-top:1px solid var(--borda); margin-top:34px; padding:20px 0 44px; text-align:center; color:#7C877C; font-size:12.5px; line-height:1.8}
-.pes-fim i{font-family:var(--display); font-style:italic}
+/* fontes e metodologia */
+.fontes{margin-top:36px; border:1px solid var(--borda); border-radius:10px; background:var(--carta); padding:20px 24px 22px; scroll-margin-top:16px}
+.fontes h4{font-family:var(--display); font-size:17px; font-weight:700; letter-spacing:-.2px}
+.fontes .sub{font-size:12.5px; color:var(--muted); margin-top:4px}
+.fontes ul{list-style:none; margin-top:14px; display:grid; gap:10px}
+.fontes li{font-size:13px; line-height:1.52; padding-left:16px; position:relative}
+.fontes li::before{content:"▪"; position:absolute; left:0; top:-1px; color:var(--verde-vivo); font-size:14px}
+.fontes code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; background:#F1F4F0; border:1px solid var(--borda-fina); border-radius:4px; padding:1px 5px; word-break:break-all}
+.fontes a{color:var(--verde); font-weight:600; text-decoration:none; border-bottom:1px solid #CFE2D4}
+.fontes a:hover{border-bottom-color:var(--verde)}
+.fontes .metodo{margin-top:14px; padding-top:12px; border-top:1px solid var(--borda-fina); font-size:12.5px; color:var(--muted); line-height:1.62}
+.fontes .nota-final{margin-top:10px; font-size:12px; color:#7C877C; font-style:italic}
 
 /* mobile */
 @media (max-width:660px){
@@ -299,7 +311,7 @@ details.urna-det .dentro{padding:4px 14px 12px; border-top:1px solid var(--borda
       <select id="mun" aria-label="Filtrar por município"><option value="">Todos os municípios</option></select>
       <button class="limpar" id="btnLimpar">Limpar</button>
     </div>
-    <p class="dica">💡 Junte município e número: <b>“Codó 12”</b>. Várias seções? Separe por vírgula: <b>“Codó 12, Codó 15”</b>. Acentos e maiúsculas são ignorados.</p>
+    <p class="dica">💡 Junte município e número: <b>“Codó 12”</b>. Várias seções? Separe por vírgula: <b>“Codó 12, Codó 15”</b>. Acentos e maiúsculas são ignorados. <a href="#fontes">Fontes e metodologia ↓</a></p>
   </div>
 </header>
 
@@ -345,11 +357,20 @@ details.urna-det .dentro{padding:4px 14px 12px; border-top:1px solid var(--borda
     </ul>
   </section>
 
-  <footer class="pes-fim">
-    <i>Painel independente, feito a partir dos dados oficiais do TSE</i><br>
-    arquivos: secoes_eleitorais_alteradas_2t-pais_2026_ma.csv · votacao_secao_2026_BR.csv · votacao_secao_2026_MA.csv<br>
-    distâncias: estimativas em linha reta via OpenStreetMap (Nominatim + Overpass).<br>
-    * comparecimento estimado: total de votos na urna do 1º turno nas seções transferidas ÷ eleitores dessas seções. A diferença é a abstenção. Em caso de divergência, prevalece a informação oficial do TRE-MA/TSE.
+  <footer class="fontes" id="fontes">
+    <h4>Fontes e metodologia</h4>
+    <p class="sub">Todos os números deste painel vêm de arquivos públicos do TSE; as distâncias, do OpenStreetMap.</p>
+    <ul>
+      <li><b>Seções eleitorais alteradas para o 2º turno de 2026 (Maranhão).</b> Arquivo <code>secoes_eleitorais_alteradas_2t-pais_2026_ma.csv</code>, obtido no portal do TSE em 17/10/2026 — 204 seções. · <a href="https://www.tse.jus.br/comunicacao/noticias/2026/Outubro/entenda-por-que-a-justica-eleitoral-trocou-o-endereco-de-algumas-secoes-para-o-2o-turno" target="_blank" rel="noopener">Por que o TSE mudou as seções</a> · <a href="https://www.tse.jus.br/servicos-eleitorais/local-de-votacao-zonas-eleitorais" target="_blank" rel="noopener">Locais de votação (TSE)</a></li>
+      <li><b>Votação por seção eleitoral — 1º turno, 04/10/2026.</b> TSE, Portal de Dados Abertos: <code>votacao_secao_2026_BR.csv</code> e <code>votacao_secao_2026_MA.csv</code>. · <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener">dataset Resultados 2026</a></li>
+      <li><b>Eleitorado e locais de votação — 2026.</b> TSE: <code>eleitorado_local_votacao_2026.zip</code> (nomes e endereços dos locais). · <a href="https://dadosabertos.tse.jus.br/dataset/eleitorado-2026" target="_blank" rel="noopener">dataset Eleitorado 2026</a></li>
+      <li><b>Distâncias.</b> Estimativa em <b>linha reta</b> entre o prédio antigo e o novo, via OpenStreetMap (Nominatim + Overpass). © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores do OpenStreetMap</a>, licença ODbL — é ordem de grandeza do percurso, não a rota real.</li>
+    </ul>
+    <p class="metodo">
+      <b>Método.</b> Percentuais sobre <b>votos válidos</b> (brancos e nulos excluídos do cálculo). “Peso” é a fatia do voto do candidato no Maranhão que saiu dessas 204 seções. A distância de cada seção é a do casamento por nome no mapa aberto, arredondada — <b>0 m</b> quando o local antigo e o novo são o mesmo prédio. Entram nas médias apenas as seções com o local identificado no mapa: <b>125 das 204</b> (≈61% dos votos válidos dessas seções); as demais aparecem como “indisponível”. Em 3 municípios (Anapurus, Paulino Neves e São José dos Basílios) o total de votos do 1º turno supera o eleitorado listado para o 2º turno — nesses casos mostramos só o total de votos, sem percentual. Em caso de divergência, prevalece a informação oficial do TRE-MA/TSE.<br>
+      * Comparecimento estimado: total de votos na urna do 1º turno nas seções transferidas ÷ eleitores dessas seções. A diferença é a abstenção.
+    </p>
+    <p class="nota-final">Painel independente, sem vínculo com o TSE. Dados extraídos em 17/10/2026; atualize a página para conferir contra a base oficial.</p>
   </footer>
 
 </main>
@@ -627,7 +648,9 @@ function res1tHTML(munNome){
   const cn = M.cargos["Presidente"]||M.cargos["Governador"];
   if(cn && M.eleitores){
     const c = 100*cn.comparec/M.eleitores;
-    h += `<div class="totais" style="border-top:2px solid var(--tinta); margin-top:12px;"><span><b>${fmt(M.eleitores)}</b> eleitores com seção transferida neste município</span><span><b>${fmt(cn.comparec)}</b> (${pct(c)}) compareceram no 1º turno</span></div>`;
+    const cmp = c<=100 ? `<b>${fmt(cn.comparec)}</b> (${pct(c)}) compareceram no 1º turno`
+                       : `<b>${fmt(cn.comparec)}</b> votos no 1º turno`;
+    h += `<div class="totais" style="border-top:2px solid var(--tinta); margin-top:12px;"><span><b>${fmt(M.eleitores)}</b> eleitores com seção transferida neste município</span><span>${cmp}</span></div>`;
   }
   return h + `</div>`;
 }
@@ -660,7 +683,7 @@ function render(){
     const rows = grupos[m];
     const els  = rows.reduce((t,r)=>t+r.eleitores,0);
     const mm = CRUZ && CRUZ.mun[m];
-    const comp = (mm&&mm.eleitores&&mm.cargos["Presidente"]) ? ` · ${pct(100*mm.cargos["Presidente"].comparec/mm.eleitores)} no 1º turno` : "";
+    const comp = (mm&&mm.eleitores&&mm.cargos["Presidente"]&&100*mm.cargos["Presidente"].comparec/mm.eleitores<=100) ? ` · ${pct(100*mm.cargos["Presidente"].comparec/mm.eleitores)} no 1º turno` : "";
     html += `<details class="mun"${abrirTudo?" open":""}>
       <summary><span class="marca" aria-hidden="true"></span>${esc(m)}<span class="info">${rows.length} ${rows.length>1?"seções":"seção"}, <b>${fmt(els)}</b> eleitores${comp}</span></summary>
       <div class="gaveta">
