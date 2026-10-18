@@ -488,7 +488,7 @@ details.urna-det .dentro{padding:4px 14px 14px}
   <section class="boletim" id="boletimPres" aria-label="Presidente — primeiro turno nas seções transferidas"></section>
   <section class="analise" id="analise" hidden>
     <h2>Quanto cada eleitorado anda</h2>
-    <p class="olho">Distância oficial entre o local do 1º turno e o local do 2º turno, medida pelo próprio TSE, e o que ela revela sobre os dois eleitorados.</p>
+    <p class="olho">Distância oficial entre o local do 1º turno e o do 2º turno. É o deslocamento do <b>local de votação</b>, não o do eleitor: sem saber onde cada um mora, o número não diz se o trajeto de cada pessoa aumentou ou diminuiu.</p>
     <div class="viz" id="viz" hidden></div>
     <div class="lentes" id="lentes"></div>
     <div class="cab-bloco"><h3>Por candidato</h3><span>distância média por eleitor, nas seções com local identificado</span></div>
@@ -529,7 +529,7 @@ details.urna-det .dentro{padding:4px 14px 14px}
       <li><b>Distâncias — coordenadas oficiais do TSE.</b> Latitude e longitude da mesma seção no <b>1º turno (04/10/2026)</b> e no <b>2º turno (25/10/2026)</b>, arquivo <code>eleitorado_local_votacao_2026_MA.csv</code>. Sem estimativa de terceiros e sem o cadastro de 2024. · <a href="https://dadosabertos.tse.jus.br/dataset/eleitorado-2026" target="_blank" rel="noopener">dataset Eleitorado 2026</a></li>
     </ul>
     <p class="metodo">
-      <b>Método.</b> Percentuais sobre <b>votos válidos</b> (brancos e nulos excluídos do cálculo). “Peso” é a fatia do voto do candidato no Maranhão que saiu dessas 194 seções. A distância de cada seção é a <b>linha reta (haversine)</b> entre a coordenada oficial do local no 1º turno e a do local no 2º turno. <b>0 m</b> quando a coordenada oficial é a mesma nos dois turnos; o nome cadastrado pode ter sido reescrito. Quem define o que é uma <b>seção alterada</b> é a <b>lista oficial do TSE</b>: o nome do local pode continuar igual mesmo quando ele se desloca, e pode mudar sem que o local saia do lugar — por isso o nome não é usado como critério aqui. Entram nas médias as seções com coordenada válida nas duas pontas: <b>190 das 194</b>. As 4 de Graça Aranha não têm coordenada no 2º turno e aparecem como “indisponível”. É ordem de grandeza do percurso, não a rota nem o tempo de viagem. Em caso de divergência, prevalece a informação oficial do TRE-MA/TSE.<br>
+      <b>Método.</b> Percentuais sobre <b>votos válidos</b> (brancos e nulos excluídos do cálculo). “Peso” é a fatia do voto do candidato no Maranhão que saiu dessas 194 seções. A distância de cada seção é a <b>linha reta (haversine)</b> entre a coordenada oficial do local no 1º turno e a do local no 2º turno. <b>0 m</b> quando a coordenada oficial é a mesma nos dois turnos; o nome cadastrado pode ter sido reescrito. Quem define o que é uma <b>seção alterada</b> é a <b>lista oficial do TSE</b>: o nome do local pode continuar igual mesmo quando ele se desloca, e pode mudar sem que o local saia do lugar — por isso o nome não é usado como critério aqui. Entram nas médias as seções com coordenada válida nas duas pontas: <b>190 das 194</b>. As 4 de Graça Aranha não têm coordenada no 2º turno e aparecem como “indisponível”. A distância é entre os <b>dois locais de votação</b>, não entre a casa do eleitor e a urna: não há dado público sobre onde cada eleitor mora. Por isso ela é o <b>teto</b> do que muda no caminho de cada pessoa — quem morava perto do local antigo passou a andar mais, quem morava perto do novo passou a andar menos, e o <b>efeito líquido sobre o eleitorado não pode ser medido com estes dados</b>. É ordem de grandeza do percurso, não a rota nem o tempo de viagem. Em caso de divergência, prevalece a informação oficial do TRE-MA/TSE.<br>
       * Comparecimento estimado: total de votos na urna do 1º turno nas seções transferidas ÷ eleitores dessas seções. A diferença é a abstenção.
     </p>
     <p class="nota-final">Painel independente, sem vínculo com o TSE. Dados extraídos em 18/10/2026; atualize a página para conferir contra a base oficial.</p>
@@ -930,7 +930,7 @@ function efeito(){
 
     <h4>Por onde o efeito passa</h4>
     <ul class="mec">
-      <li><b>Comparecimento é o canal principal.</b> Distância, lugar desconhecido e transporte criam atrito, e quem desiste primeiro é o eleitor de baixa propensão a votar.</li>
+      <li><b>Comparecimento é o canal principal.</b> Distância, lugar desconhecido e transporte criam atrito, e quem desiste primeiro é o eleitor de baixa propensão a votar. Mas o atrito depende de <b>onde cada eleitor mora</b> — dado que não existe: quem estava perto do local antigo pode ter perdido, e quem está perto do novo, ganhado.</li>
       <li><b>O atrito pode ser assimétrico.</b> ${atrito}</li>
       <li><b>Erro na urna.</b> Confusão de local ou de seção pode virar voto nulo ou em branco. Nessas seções, no 1º turno, foram <b>${fmt(urna.nulo||0)} nulos</b> e <b>${fmt(urna.branco||0)} brancos</b> sobre ${fmt(urna.comparec||0)} votos: ruído pequeno, mas mensurável.</li>
       <li><b>Efeito de comunidade.</b> O caso mais sério não é a média, é o povoado que perde a própria seção. Aí a perda pode se concentrar em uma comunidade inteira, bem acima da média.</li>
@@ -1018,7 +1018,7 @@ function secoesDe(d, termos){
           ? (mesmoCod
             ? "mesma coordenada oficial e mesmo código de local no 1º e no 2º turno; o nome cadastrado pode ter mudado"
             : "mesma coordenada oficial no 1º e no 2º turno; o nome cadastrado pode ter mudado")
-        : `distância em linha reta entre o local do 1º turno e o do 2º: ${m.toLocaleString("pt-BR")} m`;
+        : `distância em linha reta entre o local do 1º turno e o do 2º (não é a distância da casa do eleitor): ${m.toLocaleString("pt-BR")} m`;
       dist = `<span class="chipdist${(m===0)?" mesma":""}" title="${tit}">${txt}</span>`;
     } else if(reg && reg.caso === "duvida"){
       dist = `<span class="chipdist duv" title="indício de mudança, sem par de coordenadas confiável">aprox.?</span>`;

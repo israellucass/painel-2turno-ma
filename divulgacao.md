@@ -90,6 +90,8 @@
 > **Nota de transparência:** a versão anterior do painel dizia que o eleitorado de Lula andava **1,34× mais**. Era **artefato** de casamento de nomes no OpenStreetMap. Com as coordenadas oficiais do TSE, as medianas são idênticas e a média é praticamente igual.
 >
 > **Convenção das distâncias:** "0 m" só quando a coordenada é **exatamente** a mesma nos dois turnos (23 seções). Entre 1 e 119 m há 35 seções — diferença de cadastro, provavelmente o mesmo prédio. Não há arredondamento.
+>
+> **O que a distância NÃO diz (e é importante):** ela é entre os **dois locais de votação**, não entre a casa do eleitor e a urna. Não existe dado público sobre onde cada eleitor mora, então não dá para saber se o trajeto de cada pessoa **aumentou ou diminuiu**. Quem morava perto do local antigo passou a andar mais; quem morava perto do novo, menos. O número é o **teto** dessa mudança — o efeito líquido sobre o eleitorado não é medido aqui.
 
 
 ---
